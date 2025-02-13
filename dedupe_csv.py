@@ -28,10 +28,13 @@ def dedupe_csv(input_csv, output_csv):
         key = row['DedupeKey']
         if key in dedupe_dict:
             # Append GIS ID to the first occurrence
-            dedupe_dict[key]['GIS ID'] += f", {row['GIS ID']}"
+            dedupe_dict[key]['GIS ID'] = f"{dedupe_dict[key]['GIS ID']}, {str(row['GIS ID'])}"
+            # Append Resource ID to new column tracking appended resource IDs
+            dedupe_dict[key]['Appended Resource IDs'] = f"{dedupe_dict[key].get('Appended Resource IDs', dedupe_dict[key]['Resource ID'])}, {row['Resource ID']}"
         else:
             # Store the first occurrence
             dedupe_dict[key] = row.to_dict()
+            dedupe_dict[key]['Appended Resource IDs'] = row['Resource ID']
             new_rows.append(dedupe_dict[key])
     
     # Convert back to DataFrame
