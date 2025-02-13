@@ -16,7 +16,10 @@ def dedupe_csv(input_csv, output_csv):
     df_cve = df[df['Title'].str.startswith('CVE', na=False)].copy()
     
     # Process Resource ID for deduplication
-    df_cve['DedupeKey'] = df_cve['Resource ID'].apply(process_resource_id)
+    df_cve['ProcessedResourceID'] = df_cve['Resource ID'].apply(process_resource_id)
+    
+    # Create deduplication key using processed Resource ID and lowercase Title
+    df_cve['DedupeKey'] = df_cve['ProcessedResourceID'] + df_cve['Title'].str.lower()
     
     # Dictionary to track unique entries
     dedupe_dict = {}
@@ -50,8 +53,8 @@ def dedupe_csv(input_csv, output_csv):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Deduplicate CSV based on CVE Titles and Resource ID.')
-    parser.add_argument('input_csv', help='Input CSV file path')
-    parser.add_argument('output_csv', help='Output CSV file path')
+    parser.add_argument('--input_csv', required=True, help='Input CSV file path')
+    parser.add_argument('--output_csv', required=True, help='Output CSV file path')
     args = parser.parse_args()
     
     dedupe_csv(args.input_csv, args.output_csv)
